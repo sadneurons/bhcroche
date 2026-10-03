@@ -232,7 +232,7 @@ details.src summary{color:var(--accent);text-decoration:underline}
   <div id="detail"></div>
   <details class="src">
   <summary>Sources and assumptions</summary>
-  <p>Traditional MATS: typical memory assessment service pathway (referral, new patient appointment, brain imaging, MDT, follow-up), from the UK AD CWA CSF Pathway Understanding Report (June 2025, four NHS sites). BHC Phases 0, 1 and 2: the project pathway flow charts (pathway_evolution). Waiting times are deliberately omitted in this version. In the BHC phases, a dementia-stage assessment is drawn as referral back to MATS. Counts show the contacts drawn in the journey that was walked and will differ from first-year totals reported in the source.</p>
+  <p>Traditional MATS: the usual UK memory assessment pathway (referral, triage, nurse assessment, MDT meeting, imaging requested for about half of patients of which about half are CT, then a consultant or nurse follow-up); outcome ranges from the UK AD CWA CSF Pathway Understanding Report (June 2025, four NHS sites). BHC Phases 0, 1 and 2: the project pathway flow charts (pathway_evolution). Waiting times are deliberately omitted in this version. In the BHC phases, a dementia-stage assessment is drawn as referral back to MATS. Counts show the contacts drawn in the journey that was walked and will differ from first-year totals reported in the source.</p>
 </details>
 </section>
 
@@ -245,17 +245,18 @@ var GP_BHC="The patient attends the GP with a cognitive complaint. The GP orders
 var KN0="Cognitive complaint recorded; screening bloods requested";
 var CLIN=[["Medical history, medication review and semistructured clinical interview","20 min"],["Educational component","10 min"],["Focused neurological examination (PD, frontal)","10 min"],["RBANS cognitive assessment","30 min"],["Test of Premorbid Functioning","5 min"]];
 var TRI01=[["MMSE >22",""],["MoCA >24",""],["6CIT <13",""],["GPCOG >4",""],["ACE-III >85",""],["MCI recorded in GP note",""]];
-var MFT="Same-day appointment with the MFT team. If blood pressure medication is needed, it is prescribed by the MFT team.";
+var HCV="Part of the same Brain Health Clinic visit, carried out by the clinic's MFT staff: hearing and cardiovascular risk are assessed as modifiable contributors to cognitive decline.";
 var ADV="Eligibility and scope of the Brain Health Advisor role are";
 
 var N={
 /* Traditional MATS */
 t_gp:{st:"ref",title:"GP consultation",where:"GP practice",what:"The patient presents with a cognitive complaint. The GP takes a history, may apply a brief screen (GPCOG, MMSE or 6CIT), orders screening bloods and refers to the memory assessment service.",enc:{t:"visit",d:"gp"},known:KN0,next:"t_tri"},
-t_tri:{st:"ref",title:"Referral received and triaged",where:"Memory assessment service (MATS)",what:"The service triages the referral according to need and offers a new patient appointment.",known:KN0,next:"t_new"},
-t_new:{st:"assess",title:"New patient appointment",where:"Memory assessment service",what:"Assessment led by a psychiatrist (about 1 to 2 hours) or a neurologist (about 1 hour). Cognition is assessed and next steps are decided.",enc:{t:"visit",d:"new"},known:"Clinical history and bedside cognitive testing",next:"t_img"},
-t_img:{st:"invest",title:"Brain imaging",where:"Imaging department (separate appointment)",what:"MRI, SPECT or CT, depending on the site. The report returns to the requesting clinician.",enc:{t:"visit",d:"img"},known:"Clinical history, bedside cognition and a scan report",next:"t_mdt"},
-t_mdt:{st:"assess",title:"MDT meeting",where:"Memory assessment service",what:"The case is discussed by the multidisciplinary team after assessment and before the follow-up appointment.",known:"Clinical history, bedside cognition and a scan report",next:"t_fu"},
-t_fu:{st:"disc",title:"Follow-up appointment",where:"Memory assessment service",what:"A psychiatrist or neurologist (about 30 to 45 minutes) discusses the scan result and management, and considers discharge.",enc:{t:"visit",d:"fu"},known:"Clinical syndrome (MCI or dementia); underlying disease not molecularly confirmed",
+t_tri:{st:"ref",title:"Referral received and triaged",where:"Memory assessment service (MATS)",what:"The service triages the referral and offers an assessment appointment.",known:KN0,next:"t_new"},
+t_new:{st:"assess",title:"Nurse assessment",where:"Memory assessment service",what:"A memory nurse takes the history and carries out bedside cognitive testing.",enc:{t:"visit",d:"new"},known:"Clinical history and bedside cognitive testing by a nurse",next:"t_mdt"},
+t_mdt:{st:"assess",title:"MDT meeting",where:"Memory assessment service",what:"The nurse presents the case to the multidisciplinary team, which decides whether to request brain imaging. Imaging is requested for about half of patients.",known:"Clinical history and bedside cognitive testing by a nurse",
+  choices:[{label:"Imaging requested (about half of patients)",s:"Imaging (about 50%)",note:"About half of scans are CT",known:"Clinical history and bedside cognition; scan requested",to:"t_img"},{label:"No imaging requested (about half of patients)",s:"No imaging (about 50%)",note:"Straight to follow-up",known:"Clinical history and bedside cognition only; no imaging",to:"t_fu"}]},
+t_img:{st:"invest",title:"Brain imaging",where:"Imaging department (separate appointment)",what:"About half of the scans requested are CT and the rest MRI. The report returns to the team.",enc:{t:"visit",d:"img"},known:"Clinical history, bedside cognition and a scan report",next:"t_fu"},
+t_fu:{st:"disc",title:"Follow-up appointment",where:"Memory assessment service",what:"A consultant or a nurse discloses the diagnosis and discusses management.",enc:{t:"visit",d:"fu"},known:"Clinical syndrome (MCI or dementia); underlying disease not molecularly confirmed",
   choices:[{label:"Dementia syndrome",s:"Dementia",note:"Symptomatic treatment",to:"t_dem"},{label:"MCI syndrome",s:"MCI",note:"Discharge or continued review",to:"t_mci"}]},
 t_dem:{st:"out",title:"Outcome: dementia syndrome",end:true,outcome:"Symptomatic medication (cholinesterase inhibitor or memantine) and discharge to primary care. Secondary-care follow-up varies by locality."},
 t_mci:{st:"out",title:"Outcome: MCI syndrome",end:true,outcome:"Discharge to the GP or continued review. The proportion discharged after the first year ranged from 30% to 100% across the four mapped sites."},
@@ -281,41 +282,40 @@ p0_out:{st:"out",title:"Outcome",end:true,outcome:"BHC report letter addressed t
 p1_gp:{st:"ref",title:"GP consultation",where:"GP practice",what:GP_BHC,enc:{t:"visit",d:"gp"},known:KN0,next:"p1_tri"},
 p1_tri:{st:"ref",title:"Triage (PARIS)",where:"GMMH",what:"The referral is triaged against cognitive screening thresholds or an MCI label in the GP note.",items:TRI01,known:KN0,
   choices:[{label:"Meets criteria",s:"Meets",note:"Booked into the BHC",to:"p1_book"},{label:"Does not meet criteria",s:"Not met",note:"Standard MATS assessment",to:"x_std"}]},
-p1_book:{st:"book",title:"Booking and MRI arrangement",where:"GMMH administration",what:"Admin enters the referral onto HIVE and books the GMMH clinic; the MFT appointment follows directly after it. MRI is booked on ICE at a local hospital. Correspondence and a pre-assessment booklet are sent.",known:KN0,next:"p1_mri"},
+p1_book:{st:"book",title:"Booking and MRI arrangement",where:"GMMH administration",what:"Admin enters the referral onto HIVE and books a single Brain Health Clinic visit, which covers the clinical and cognitive assessment and the hearing and cardiovascular risk assessment. MRI is booked on ICE at a local hospital. Correspondence and a pre-assessment booklet are sent.",known:KN0,next:"p1_mri"},
 p1_mri:{st:"book",title:"MRI brain (dementia protocol)",where:"Local hospital",what:"Results are reported on SECTRA and the local MATS team is informed by email.",enc:{t:"visit",d:"mri"},known:"Structural MRI available before clinic",next:"p1_clinic"},
-p1_clinic:{st:"assess",title:"BHC assessment",where:"GMMH Brain Health Clinic",what:"One consultant-led appointment.",items:CLIN.concat([["Scan review and results feedback","10 min"],["Discussion of further investigations; LP consent","15 min"],["Documentation (clinician)","20 min"]]),enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile and MRI reviewed",next:"p1_stage"},
-p1_stage:{st:"assess",title:"Diagnosis and staging",where:"GMMH Brain Health Clinic",what:"The disease stage is determined.",known:"History, examination, RBANS profile and MRI reviewed",
+p1_clinic:{st:"assess",title:"Clinical and cognitive assessment",where:"Brain Health Clinic",what:"The consultant-led part of the clinic visit.",items:CLIN.concat([["Scan review and results feedback","10 min"],["Discussion of further investigations; LP consent","15 min"],["Documentation (clinician)","20 min"]]),enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile and MRI reviewed",next:"p1_hcv"},
+p1_hcv:{st:"assess",title:"Hearing and cardiovascular risk",where:"Brain Health Clinic, same visit",what:HCV,items:[["Hearing assessment",""],["Cardiovascular risk assessment",""],["Blood pressure; treatment started by the clinic team if needed",""]],enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile, MRI reviewed, hearing and cardiovascular risk",next:"p1_stage"},
+p1_stage:{st:"assess",title:"Diagnosis and staging",where:"Brain Health Clinic",what:"The disease stage is determined.",known:"History, examination, RBANS profile, MRI reviewed, hearing and cardiovascular risk",
   choices:[{label:"Prodromal stage",s:"Prodromal",note:"Further investigation considered",to:"p1_lpq"},{label:"Dementia stage",s:"Dementia",note:"Referred back to MATS",to:"x_back"}]},
-p1_lpq:{st:"invest",title:"Does the patient need an LP?",where:"GMMH Brain Health Clinic",what:"The need for CSF biomarkers is decided.",known:"History, examination, RBANS profile and MRI reviewed",
-  choices:[{label:"Yes, LP explained and booked",s:"LP",note:"CSF biomarkers",to:"p1_mftlp"},{label:"No or unable",s:"No / unable",note:"FDG PET instead",to:"p1_mftpet"}]},
-p1_mftlp:{st:"invest",title:"MFT appointment",where:"MFT, directly after the GMMH appointment",what:MFT,enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile and MRI reviewed",next:"p1_lp"},
-p1_mftpet:{st:"invest",title:"MFT appointment",where:"MFT, directly after the GMMH appointment",what:MFT,enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile and MRI reviewed",next:"p1_pet"},
+p1_lpq:{st:"invest",title:"Does the patient need an LP?",where:"Brain Health Clinic",what:"The need for CSF biomarkers is decided.",known:"History, examination, RBANS profile, MRI reviewed, hearing and cardiovascular risk",
+  choices:[{label:"Yes, LP explained and booked",s:"LP",note:"CSF biomarkers",to:"p1_lp"},{label:"No or unable",s:"No / unable",note:"FDG PET instead",to:"p1_pet"}]},
 p1_lp:{st:"invest",title:"Lumbar puncture",where:"LP service",what:"CSF is collected.",enc:{t:"visit",d:"lp"},known:"CSF collected; result pending",next:"p1_lab"},
 p1_lab:{st:"invest",title:"Samples to the MFT laboratory",where:"MFT laboratories (HIVE)",what:"The assay is run twice monthly.",known:"CSF collected; result pending",next:"p1_dlp"},
 p1_pet:{st:"invest",title:"FDG PET",where:"PET imaging service",what:"Metabolic imaging in place of LP.",enc:{t:"visit",d:"pet"},known:"FDG PET pattern available",next:"p1_dpet"},
-p1_dlp:{st:"disc",title:"Follow-up (45 min): LP result",where:"MFT",what:"LP results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},known:"CSF result available",
+p1_dlp:{st:"disc",title:"Follow-up (45 min): LP result",where:"Brain Health Clinic",what:"LP results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},known:"CSF result available",
   choices:[{label:"Unequivocal result",s:"Unequivocal",note:"",known:"CSF biomarker status established",to:"p1_out"},{label:"Equivocal result",s:"Equivocal",note:"",known:"CSF result equivocal",to:"p1_out"}]},
-p1_dpet:{st:"disc",title:"Follow-up (45 min): PET result",where:"MFT",what:"Results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},known:"Diagnosis disclosed with FDG PET",next:"p1_out"},
+p1_dpet:{st:"disc",title:"Follow-up (45 min): PET result",where:"Brain Health Clinic",what:"Results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},known:"Diagnosis disclosed with FDG PET",next:"p1_out"},
 p1_out:{st:"out",title:"Outcome",end:true,outcome:"Discharge to the GP, research recruitment and Brain Health Advisor follow-up (ongoing support, signposting, care coordination), with a one-year review. "+ADV+" under examination."},
 
 /* BHC Phase 2 */
 p2_gp:{st:"ref",title:"GP consultation",where:"GP practice",what:GP_BHC.replace("through the Gateway Duty Desk","to the GMMH MATS clinic"),enc:{t:"visit",d:"gp"},known:KN0,next:"p2_tri"},
 p2_tri:{st:"ref",title:"Referral received and triaged",where:"GMMH MATS clinic",what:"The referral is triaged against cognitive screening thresholds.",items:[["6CIT <12",""],["MMSE >22",""],["ACE-III >85",""]],known:KN0,
   choices:[{label:"Meets criteria",s:"Meets",note:"Booked into the BHC",to:"p2_book"},{label:"Does not meet criteria",s:"Not met",note:"Standard MATS assessment",to:"x_std"}]},
-p2_book:{st:"book",title:"Booking and preparation",where:"GMMH administration",what:"Admin enters the referral onto HIVE and books the GMMH clinic; the MFT appointment follows directly after it. MRI is booked into the CRF scanner for the day of the appointment. Correspondence is sent with a pre-assessment booklet or e-booklet.",known:KN0,next:"p2_mri"},
-p2_mri:{st:"assess",title:"Clinic day: MRI",where:"CRF scanner",what:"MR brain dementia protocol, acquired on the day of the appointment.",items:[["T1",""],["Resting-state fMRI",""],["Coronal T2 FLAIR",""],["Diffusion MRI",""],["Susceptibility-weighted imaging",""],["Research: task fMRI and ASL",""]],enc:{t:"visit",d:"clinic"},known:"Structural MRI available for same-day review",next:"p2_clinic"},
-p2_clinic:{st:"assess",title:"Clinic day: BHC assessment",where:"GMMH Brain Health Clinic",what:"One consultant-led appointment, including vascular assessment.",items:CLIN.concat([["Scan review and results feedback","10 min"],["Discussion of further investigations; LP consent","15 min"],["Cardiac pulse wave velocity and vascular assessment",""],["Documentation (clinician)","20 min"]]),enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile, MRI reviewed and vascular assessment",next:"p2_stage"},
-p2_stage:{st:"assess",title:"Diagnosis and staging",where:"GMMH Brain Health Clinic",what:"The disease stage is determined.",known:"History, examination, RBANS profile, MRI reviewed and vascular assessment",
+p2_book:{st:"book",title:"Booking and preparation",where:"GMMH administration",what:"Admin enters the referral onto HIVE and books a single Brain Health Clinic visit, which covers the MRI, the clinical and cognitive assessment and the hearing and cardiovascular risk assessment. MRI is booked into the CRF scanner for the day of the appointment. Correspondence is sent with a pre-assessment booklet or e-booklet.",known:KN0,next:"p2_mri"},
+p2_mri:{st:"assess",title:"Clinic day: MRI",where:"CRF scanner",what:"MR brain dementia protocol, acquired on the day of the appointment.",items:[["T1",""],["Coronal T2 FLAIR",""],["Diffusion MRI",""],["Susceptibility-weighted imaging",""],["Research: task fMRI and ASL",""]],enc:{t:"visit",d:"clinic"},known:"Structural MRI available for same-day review",next:"p2_clinic"},
+p2_clinic:{st:"assess",title:"Clinical and cognitive assessment",where:"Brain Health Clinic",what:"The consultant-led part of the clinic visit.",items:CLIN.concat([["Scan review and results feedback","10 min"],["Discussion of further investigations; LP consent","15 min"],["Documentation (clinician)","20 min"]]),enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile and MRI reviewed",next:"p2_hcv"},
+p2_hcv:{st:"assess",title:"Hearing and cardiovascular risk",where:"Brain Health Clinic, same visit",what:HCV,items:[["Hearing assessment",""],["Cardiovascular risk assessment",""],["Blood pressure; treatment started by the clinic team if needed",""],["Cardiac pulse wave velocity",""]],enc:{t:"visit",d:"clinic"},known:"History, examination, RBANS profile, MRI reviewed, hearing and cardiovascular risk",next:"p2_stage"},
+p2_stage:{st:"assess",title:"Diagnosis and staging",where:"Brain Health Clinic",what:"The disease stage is determined.",known:"History, examination, RBANS profile, MRI reviewed, hearing and cardiovascular risk",
   choices:[{label:"Prodromal stage",s:"Prodromal",note:"Plasma biomarker drawn",to:"p2_bio"},{label:"Dementia stage",s:"Dementia",note:"Referred back to MATS",to:"x_back"}]},
-p2_bio:{st:"invest",title:"Plasma pTau217 drawn",where:"Brain Health Clinic, same day",what:"The blood sample is taken during the clinic visit.",enc:{t:"visit",d:"clinic"},known:"Plasma sample taken; result pending",next:"p2_mft"},
-p2_mft:{st:"invest",title:"MFT appointment",where:"MFT, directly after the GMMH appointment",what:MFT,enc:{t:"visit",d:"clinic"},known:"Plasma sample taken; result pending",next:"p2_res"},
+p2_bio:{st:"invest",title:"Plasma pTau217 drawn",where:"Brain Health Clinic, same day",what:"The blood sample is taken during the clinic visit.",enc:{t:"visit",d:"clinic"},known:"Plasma sample taken; result pending",next:"p2_res"},
 p2_res:{st:"invest",title:"pTau217 result",where:"MFT laboratories (HIVE)",what:"Samples go to the MFT laboratories and the assay is run twice monthly. The patient has left the clinic and awaits the result.",known:"Plasma sample taken; result pending",
   choices:[{label:"Determinate: elevated",s:"Elevated",note:"",known:"Plasma pTau217 elevated",to:"p2_disc"},{label:"Determinate: not elevated",s:"Not elevated",note:"",known:"Plasma pTau217 not elevated",to:"p2_disc"},{label:"Indeterminate",s:"Indeterminate",note:"Confirmatory LP",known:"Plasma pTau217 indeterminate; confirmatory LP required",to:"p2_lpb"}]},
-p2_lpb:{st:"invest",title:"LP explained and booked",where:"GMMH",what:"Lumbar puncture is arranged after an indeterminate plasma result. Consent was discussed during the clinic assessment.",known:"Plasma pTau217 indeterminate; confirmatory LP required",next:"p2_lp"},
+p2_lpb:{st:"invest",title:"LP explained and booked",where:"Brain Health Clinic",what:"Lumbar puncture is arranged after an indeterminate plasma result. Consent was discussed during the clinic assessment.",known:"Plasma pTau217 indeterminate; confirmatory LP required",next:"p2_lp"},
 p2_lp:{st:"invest",title:"Lumbar puncture",where:"LP service",what:"CSF is collected.",enc:{t:"visit",d:"lp"},known:"CSF collected; result pending",next:"p2_lab"},
 p2_lab:{st:"invest",title:"Samples to the MFT laboratory",where:"MFT laboratories (HIVE)",what:"The assay is run twice monthly.",known:"CSF collected; result pending",next:"p2_dlp"},
-p2_disc:{st:"disc",title:"Follow-up (45 min): results disclosure",where:"MFT",what:"Results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},next:"p2_out"},
-p2_dlp:{st:"disc",title:"Follow-up (45 min): LP result",where:"MFT",what:"LP results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},known:"CSF result available",
+p2_disc:{st:"disc",title:"Follow-up (45 min): results disclosure",where:"Brain Health Clinic",what:"Results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},next:"p2_out"},
+p2_dlp:{st:"disc",title:"Follow-up (45 min): LP result",where:"Brain Health Clinic",what:"LP results disclosure, medication review and research recruitment.",enc:{t:"visit",d:"disc"},known:"CSF result available",
   choices:[{label:"Unequivocal result",s:"Unequivocal",note:"",known:"CSF biomarker status established",to:"p2_out"},{label:"Equivocal result",s:"Equivocal",note:"",known:"CSF result equivocal",to:"p2_out"}]},
 p2_out:{st:"out",title:"Outcome",end:true,outcome:"BHC report letter addressed to the patient. Discharge to the GP, research recruitment, Brain Health Advisor follow-up (ongoing support, signposting, care coordination) and a one-year review. "+ADV+" being defined."}
 };
@@ -323,17 +323,17 @@ p2_out:{st:"out",title:"Outcome",end:true,outcome:"BHC report letter addressed t
 /* layout: [column, row] */
 var PW={
   trad:{label:"Traditional MATS",sub:"Typical memory assessment service",start:"t_gp",pos:{
-    t_gp:[0,1],t_tri:[1,1],t_new:[2,1],t_img:[3,1],t_mdt:[4,1],t_fu:[5,1],t_dem:[6,0.5],t_mci:[6,1.5]},days:[]},
+    t_gp:[0,1],t_tri:[1,1],t_new:[2,1],t_mdt:[3,1],t_img:[4,0],t_fu:[5,1],t_dem:[6,0.5],t_mci:[6,1.5]},days:[]},
   p0:{label:"BHC Phase 0",sub:"Jan 2022 to Apr 2023",start:"p0_gp",pos:{
     p0_gp:[0,1],p0_tri:[1,1],x_std:[2,2.4],p0_book:[2,1],p0_clinic:[3,1],p0_mri:[4,1],p0_stage:[5,1],p0_pet:[6,0],x_back:[6,2.4],p0_disc:[7,1],p0_out:[8,1]},days:[]},
   p1:{label:"BHC Phase 1",sub:"Pilot pathway",start:"p1_gp",pos:{
-    p1_gp:[0,1.5],p1_tri:[1,1.5],x_std:[2,3.4],p1_book:[2,1.5],p1_mri:[3,1.5],p1_clinic:[4,1.5],p1_stage:[5,1.5],x_back:[6,3.4],p1_lpq:[6,1.5],
-    p1_mftlp:[7,.5],p1_mftpet:[7,2.5],p1_lp:[8,.5],p1_lab:[9,.5],p1_dlp:[10,.5],p1_pet:[8,2.5],p1_dpet:[9,2.5],p1_out:[11,1.5]},
-    days:[{label:"Clinic day: GMMH then MFT",ids:["p1_clinic","p1_stage","p1_lpq","p1_mftlp","p1_mftpet"]}]},
+    p1_gp:[0,1.5],p1_tri:[1,1.5],x_std:[2,3.4],p1_book:[2,1.5],p1_mri:[3,1.5],p1_clinic:[4,1.5],p1_hcv:[5,1.5],p1_stage:[6,1.5],x_back:[7,3.4],p1_lpq:[7,1.5],
+    p1_lp:[8,.5],p1_lab:[9,.5],p1_dlp:[10,.5],p1_pet:[8,2.5],p1_dpet:[9,2.5],p1_out:[11,1.5]},
+    days:[{label:"Clinic day: one Brain Health Clinic visit",ids:["p1_clinic","p1_hcv","p1_stage","p1_lpq"]}]},
   p2:{label:"BHC Phase 2",sub:"One-stop shop",start:"p2_gp",pos:{
-    p2_gp:[0,1],p2_tri:[1,1],x_std:[2,2.5],p2_book:[2,1],p2_mri:[3,1],p2_clinic:[4,1],p2_stage:[5,1],x_back:[6,2.5],p2_bio:[6,1],p2_mft:[7,1],p2_res:[8,1],
+    p2_gp:[0,1],p2_tri:[1,1],x_std:[2,2.5],p2_book:[2,1],p2_mri:[3,1],p2_clinic:[4,1],p2_hcv:[5,1],p2_stage:[6,1],x_back:[7,2.5],p2_bio:[7,1],p2_res:[8,1],
     p2_disc:[9,0],p2_lpb:[9,2],p2_lp:[10,2],p2_lab:[11,2],p2_dlp:[12,2],p2_out:[13,1]},
-    days:[{label:"Clinic day: one attendance",ids:["p2_mri","p2_clinic","p2_stage","p2_bio","p2_mft"]}]}
+    days:[{label:"Clinic day: one attendance",ids:["p2_mri","p2_clinic","p2_hcv","p2_stage","p2_bio"]}]}
 };
 var KEYS=["trad","p0","p1","p2"];
 
