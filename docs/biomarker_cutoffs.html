@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biomarker cut-offs: an interactive model</title>
+<style>
+:root{
+  --blue:#005eb8; --dark:#003087; --ink:#212b32; --muted:#4c6272; --line:#d8dde0; --bg:#ffffff; --panel:#f0f4f5;
+  --neg:#4c6272; --pos:#005eb8;
+  --z-neg:#d5efec; --z-mid:#ffe9b8; --z-pos:#c9dcf1;
+  --t-neg:#00675f; --t-mid:#8a5a00; --t-pos:#003087;
+  --font:Frutiger,"Frutiger LT Std",Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 var(--font);display:grid;
+  grid-template-columns:minmax(0,1fr) 350px;grid-template-rows:auto minmax(0,1fr);overflow:hidden}
+header{grid-column:1 / -1;padding:10px 16px;background:var(--blue);color:#fff}
+header h1{margin:0;font-size:19px}
+header p{margin:2px 0 0;font-size:13px;opacity:.92}
+.embed header{display:none} /* the host slide supplies the title */
+.plot{min-width:0;min-height:0;padding:6px 4px 0 8px}
+svg{display:block;width:100%;height:100%;user-select:none;-webkit-user-select:none;touch-action:none}
+.side{min-height:0;overflow:auto;background:var(--panel);border-left:4px solid var(--blue);padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.tile{border-radius:4px;padding:6px 8px;line-height:1.2}
+.tile b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.tile span{font-size:11.5px}
+.tile.neg{background:var(--z-neg);color:var(--t-neg)}
+.tile.mid{background:var(--z-mid);color:var(--t-mid)}
+.tile.pos{background:var(--z-pos);color:var(--t-pos)}
+.tile small{display:block;font-size:11.5px;color:var(--ink);margin-top:2px}
+.facts{margin:0;padding:0;list-style:none;font-size:13px;border-top:1px solid var(--line)}
+.facts li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid var(--line)}
+.facts b{font-variant-numeric:tabular-nums}
+.note{margin:0;font-size:12.5px;color:var(--t-mid);font-weight:700;min-height:1.2em}
+.ctl{display:grid;grid-template-columns:1fr 46px;gap:1px 8px;align-items:center;font-size:12.5px}
+.ctl label{grid-column:1 / -1;color:var(--muted);margin-top:3px}
+.ctl output{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:0;accent-color:var(--blue)}
+.btns{display:flex;gap:8px;margin-top:2px}
+button{font:inherit;font-weight:700;border-radius:4px;padding:7px 12px;cursor:pointer;border:0}
+#resim{background:#007f3b;color:#fff;box-shadow:0 3px 0 #00401e;flex:1}
+#resim:hover{background:#00662f}
+#reset{background:#fff;color:var(--ink);border:1px solid var(--muted)}
+:focus-visible{outline:3px solid #ffb81c;outline-offset:1px}
+.handle{cursor:ew-resize}
+.handle circle{stroke:#fff;stroke-width:2.5}
+.handle:hover circle,.handle.drag circle{stroke:#ffb81c}
+text{font-family:var(--font)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Biomarker cut-offs: an interactive model</h1>
+  <p>Drag either curve by its handle to move that group's median. The bars are a simulated cohort; the cut-offs are worked out from that cohort.</p>
+</header>
+<div class="plot"><svg id="svg" viewBox="0 0 880 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Simulated plasma pTau217 distributions for amyloid-negative and amyloid-positive patients with two cut-offs"></svg></div>
+<aside class="side">
+  <div class="tiles">
+    <div class="tile neg"><span>Negative</span><b id="t-neg">–</b><small id="t-npv"></small></div>
+    <div class="tile mid"><span>Uncertain</span><b id="t-mid">–</b><small>need CSF or PET</small></div>
+    <div class="tile pos"><span>Positive</span><b id="t-pos">–</b><small id="t-ppv"></small></div>
+  </div>
+  <p class="note" id="note"></p>
+  <ul class="facts">
+    <li><span>Area under the ROC curve</span><b id="f-auc">–</b></li>
+    <li><span>One cut-off instead: misclassified</span><b id="f-single">–</b></li>
+    <li><span>One cut-off: sensitivity / specificity</span><b id="f-ss">–</b></li>
+  </ul>
+  <div class="ctl">
+    <label for="c-sens">Lower cut-off set for sensitivity of</label>
+    <input type="range" id="c-sens" min="80" max="99" step="1"><output id="o-sens"></output>
+    <label for="c-spec">Upper cut-off set for specificity of</label>
+    <input type="range" id="c-spec" min="80" max="99" step="1"><output id="o-spec"></output>
+    <label for="c-prev">Patients who are amyloid positive</label>
+    <input type="range" id="c-prev" min="10" max="90" step="1"><output id="o-prev"></output>
+    <label for="c-sdn">Spread of amyloid-negative values</label>
+    <input type="range" id="c-sdn" min="0.5" max="2" step="0.05"><output id="o-sdn"></output>
+    <label for="c-sdp">Spread of amyloid-positive values</label>
+    <input type="range" id="c-sdp" min="0.5" max="2" step="0.05"><output id="o-sdp"></output>
+    <label for="c-n">Patients in the simulated cohort</label>
+    <input type="range" id="c-n" min="100" max="3000" step="100"><output id="o-n"></output>
+  </div>
+  <div class="btns">
+    <button id="resim" type="button">Resimulate cohort</button>
+    <button id="reset" type="button">Reset</button>
+  </div>
+</aside>
+
+<script>
+(function(){
+"use strict";
+var NS="http://www.w3.org/2000/svg";
+var DEFAULTS={muN:0,muP:2.6,sdN:1,sdP:1.1,prev:0.5,n:1000,sens:0.95,spec:0.95};
+var S=Object.assign({},DEFAULTS);
+var X0=-4.5,X1=8.5,BINS=65,BW=(X1-X0)/BINS;
+var W=880,H=560,L=14,R=866,TOP=96,BOT=512; // plot box in SVG units
+var z=[],u=[];                                // per-patient standard-normal draw and group draw
+var svg=document.getElementById("svg");
+var $=function(id){return document.getElementById(id)};
+
+function el(name,attrs,parent,text){
+  var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  if(text!=null) e.textContent=text;
+  (parent||svg).appendChild(e);return e;
+}
+function sx(x){return L+(x-X0)/(X1-X0)*(R-L)}
+function invx(px){return X0+(px-L)/(R-L)*(X1-X0)}
+function pdf(x,m,s){var d=(x-m)/s;return Math.exp(-0.5*d*d)/(s*2.5066282746)}
+function pct(v,d){return isFinite(v)?(100*v).toFixed(d||0)+"%":"–"}
+
+/* A new cohort: fresh random draws. Dragging re-uses the same draws, so the cohort moves smoothly. */
+function draw(){
+  z=[];u=[];
+  for(var i=0;i<3000;i++){
+    var a=Math.random()||1e-9,b=Math.random();
+    z.push(Math.sqrt(-2*Math.log(a))*Math.cos(6.283185307*b));
+    u.push(Math.random());
+  }
+}
+function quantile(sorted,p){
+  if(!sorted.length) return NaN;
+  var h=(sorted.length-1)*p,lo=Math.floor(h),hi=Math.ceil(h);
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(h-lo);
+}
+
+function compute(){
+  var neg=[],pos=[],i;
+  for(i=0;i<S.n;i++){
+    if(u[i]<S.prev) pos.push(S.muP+S.sdP*z[i]); else neg.push(S.muN+S.sdN*z[i]);
+  }
+  neg.sort(function(a,b){return a-b});pos.sort(function(a,b){return a-b});
+  var lower=quantile(pos,1-S.sens),upper=quantile(neg,S.spec),merged=false;
+  if(lower>upper){lower=upper=(lower+upper)/2;merged=true;}
+  var c={negB:0,posB:0,negM:0,posM:0,negA:0,posA:0};
+  neg.forEach(function(x){if(x<lower)c.negB++;else if(x>upper)c.negA++;else c.negM++});
+  pos.forEach(function(x){if(x<lower)c.posB++;else if(x>upper)c.posA++;else c.posM++});
+  /* best single cut-off (Youden) and area under the ROC curve */
+  var all=neg.map(function(x){return [x,0]}).concat(pos.map(function(x){return [x,1]})).sort(function(a,b){return a[0]-b[0]});
+  var belowNeg=0,belowPos=0,best=-1,bs=0,bp=0,rankSum=0;
+  all.forEach(function(d,k){
+    if(d[1]){belowPos++;rankSum+=k+1;} else belowNeg++;
+    var sens=(pos.length-belowPos)/pos.length,spec=belowNeg/neg.length;
+    if(sens+spec>best){best=sens+spec;bs=sens;bp=spec;}
+  });
+  var auc=(rankSum-pos.length*(pos.length+1)/2)/(pos.length*neg.length);
+  var wrong=((1-bs)*pos.length+(1-bp)*neg.length)/S.n;
+  return {neg:neg,pos:pos,lower:lower,upper:upper,merged:merged,c:c,auc:auc,wrong:wrong,bs:bs,bp:bp};
+}
+
+function hist(values){
+  var h=new Array(BINS).fill(0);
+  values.forEach(function(x){var k=Math.floor((x-X0)/BW);if(k>=0&&k<BINS)h[k]++});
+  return h;
+}
+
+function render(){
+  var r=compute();
+  var peak=Math.max(S.n*S.prev*pdf(0,0,S.sdP),S.n*(1-S.prev)*pdf(0,0,S.sdN))*BW;
+  var ymax=peak*1.45;
+  function sy(v){return BOT-(v/ymax)*(BOT-TOP)}
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+  /* zones */
+  var xl=sx(r.lower),xu=sx(r.upper);
+  el("rect",{x:L,y:TOP-60,width:Math.max(0,xl-L),height:BOT-TOP+60,fill:"var(--z-neg)"});
+  if(!r.merged) el("rect",{x:xl,y:TOP-60,width:Math.max(0,xu-xl),height:BOT-TOP+60,fill:"var(--z-mid)"});
+  el("rect",{x:xu,y:TOP-60,width:Math.max(0,R-xu),height:BOT-TOP+60,fill:"var(--z-pos)"});
+  el("text",{x:(L+xl)/2,y:TOP-36,"text-anchor":"middle","font-size":19,"font-weight":700,fill:"var(--t-neg)"},svg,"Negative");
+  el("text",{x:(xu+R)/2,y:TOP-36,"text-anchor":"middle","font-size":19,"font-weight":700,fill:"var(--t-pos)"},svg,"Positive");
+  if(!r.merged&&xu-xl>88) el("text",{x:(xl+xu)/2,y:TOP-36,"text-anchor":"middle","font-size":17,"font-weight":700,fill:"var(--t-mid)"},svg,"Uncertain");
+
+  /* simulated cohort */
+  var hn=hist(r.neg),hp=hist(r.pos),k;
+  for(k=0;k<BINS;k++){
+    var x=sx(X0+k*BW),w=sx(X0+(k+1)*BW)-x-1;
+    if(hn[k]) el("rect",{x:x,y:sy(hn[k]),width:w,height:BOT-sy(hn[k]),fill:"var(--neg)",opacity:.5});
+    if(hp[k]) el("rect",{x:x,y:sy(hp[k]),width:w,height:BOT-sy(hp[k]),fill:"var(--pos)",opacity:.5});
+  }
+  /* underlying distributions */
+  function curve(m,s,scale,colour){
+    var d="",i,xx;
+    for(i=0;i<=220;i++){xx=X0+(X1-X0)*i/220;d+=(i?"L":"M")+sx(xx).toFixed(1)+","+sy(scale*pdf(xx,m,s)*BW).toFixed(1);}
+    el("path",{d:d,fill:"none",stroke:colour,"stroke-width":2.5});
+  }
+  curve(S.muN,S.sdN,S.n*(1-S.prev),"var(--neg)");
+  curve(S.muP,S.sdP,S.n*S.prev,"var(--dark)");
+  el("line",{x1:L,x2:R,y1:BOT,y2:BOT,stroke:"var(--muted)","stroke-width":1.5});
+  el("text",{x:(L+R)/2,y:BOT+30,"text-anchor":"middle","font-size":15,fill:"var(--muted)"},svg,"Plasma pTau217 concentration (log scale) →");
+
+  /* cut-offs */
+  function cut(xp,label,anchor){
+    el("line",{x1:xp,x2:xp,y1:TOP-60,y2:BOT,stroke:"var(--ink)","stroke-width":2});
+    var t=el("text",{x:xp+(anchor==="end"?-7:7),y:TOP+2,"text-anchor":anchor,"font-size":13.5,fill:"var(--ink)"});
+    label.forEach(function(line,i){el("tspan",{x:xp+(anchor==="end"?-7:7),dy:i?16:0},t,line)});
+  }
+  if(r.merged) cut(xl,["One cut-off meets","both targets"],"start");
+  else{
+    cut(xl,["Lower cut-off",pct(S.sens)+" sensitivity"],"end");
+    cut(xu,["Upper cut-off",pct(S.spec)+" specificity"],"start");
+  }
+
+  /* drag handles at the peak of each curve */
+  function handle(which,m,s,scale,colour,label){
+    var g=el("g",{"class":"handle","data-which":which,tabindex:0,role:"slider","aria-label":label+" median"});
+    var px=sx(m),py=sy(scale*pdf(m,m,s)*BW);
+    el("line",{x1:px,x2:px,y1:py,y2:BOT,stroke:colour,"stroke-width":1.5,"stroke-dasharray":"4 4"},g);
+    el("circle",{cx:px,cy:py,r:11,fill:colour},g);
+    el("path",{d:"M"+(px-5)+","+py+"l3,-3v6zM"+(px+5)+","+py+"l-3,-3v6z",fill:"#fff"},g);
+    el("text",{x:px,y:py-18,"text-anchor":"middle","font-size":14,"font-weight":700,fill:colour},g,label);
+    return g;
+  }
+  handle("muN",S.muN,S.sdN,S.n*(1-S.prev),"var(--neg)","Amyloid negative");
+  handle("muP",S.muP,S.sdP,S.n*S.prev,"var(--dark)","Amyloid positive");
+
+  /* side panel */
+  var c=r.c,below=c.negB+c.posB,above=c.negA+c.posA,mid=c.negM+c.posM;
+  $("t-neg").textContent=pct(below/S.n);
+  $("t-mid").textContent=r.merged?"0%":pct(mid/S.n);
+  $("t-pos").textContent=pct(above/S.n);
+  $("t-npv").textContent=below?pct(c.negB/below)+" truly negative":"";
+  $("t-ppv").textContent=above?pct(c.posA/above)+" truly positive":"";
+  $("note").textContent=r.merged?"The groups barely overlap: no uncertain zone is needed.":"";
+  $("f-auc").textContent=r.auc.toFixed(2);
+  $("f-single").textContent=pct(r.wrong);
+  $("f-ss").textContent=pct(r.bs)+" / "+pct(r.bp);
+}
+
+/* dragging */
+var dragging=null;
+function svgX(evt){var p=svg.getBoundingClientRect();var scale=Math.min(p.width/W,p.height/H);var ox=(p.width-W*scale)/2;return (evt.clientX-p.left-ox)/scale;}
+svg.addEventListener("pointerdown",function(e){
+  var g=e.target.closest(".handle");if(!g) return;
+  dragging=g.getAttribute("data-which");try{svg.setPointerCapture(e.pointerId)}catch(err){}e.preventDefault();
+});
+svg.addEventListener("pointermove",function(e){
+  if(!dragging) return;
+  S[dragging]=Math.max(X0+1.5,Math.min(X1-1.5,invx(svgX(e))));
+  render();
+});
+function endDrag(){dragging=null}
+svg.addEventListener("pointerup",endDrag);svg.addEventListener("pointercancel",endDrag);
+svg.addEventListener("keydown",function(e){
+  var g=e.target.closest&&e.target.closest(".handle");if(!g) return;
+  var step={ArrowLeft:-0.1,ArrowRight:0.1}[e.key];if(!step) return;
+  var which=g.getAttribute("data-which");
+  S[which]=Math.max(X0+1.5,Math.min(X1-1.5,S[which]+step));
+  e.preventDefault();e.stopPropagation();render();
+  var again=svg.querySelector('.handle[data-which="'+which+'"]');if(again) again.focus();
+});
+
+/* controls */
+var CTL=[["c-sens","sens",100,"o-sens",function(v){return Math.round(v*100)+"%"}],
+         ["c-spec","spec",100,"o-spec",function(v){return Math.round(v*100)+"%"}],
+         ["c-prev","prev",100,"o-prev",function(v){return Math.round(v*100)+"%"}],
+         ["c-sdn","sdN",1,"o-sdn",function(v){return v.toFixed(2)}],
+         ["c-sdp","sdP",1,"o-sdp",function(v){return v.toFixed(2)}],
+         ["c-n","n",1,"o-n",function(v){return String(v)}]];
+function syncControls(){
+  CTL.forEach(function(c){$(c[0]).value=S[c[1]]*c[2];$(c[3]).textContent=c[4](S[c[1]]);});
+}
+CTL.forEach(function(c){
+  $(c[0]).addEventListener("input",function(){
+    S[c[1]]=parseFloat(this.value)/c[2];$(c[3]).textContent=c[4](S[c[1]]);render();
+  });
+});
+$("resim").addEventListener("click",function(){draw();render();});
+$("reset").addEventListener("click",function(){S=Object.assign({},DEFAULTS);syncControls();draw();render();});
+
+/* embedding: hide the page title in a frame, and pass clicker keys up to a reveal.js deck */
+var q=new URLSearchParams(location.search),inFrame=false;
+try{inFrame=window.self!==window.top}catch(e){inFrame=true}
+if(q.get("embed")==="1"||(inFrame&&q.get("embed")!=="0")) document.documentElement.classList.add("embed");
+if(inFrame) document.addEventListener("keydown",function(e){
+  if(e.target.closest&&(e.target.closest(".handle")||e.target.closest("input"))) return; // arrows adjust the control in focus
+  var m={PageDown:"next",PageUp:"prev",ArrowRight:"next",ArrowLeft:"prev"}[e.key];
+  if(!m||e.altKey||e.ctrlKey||e.metaKey) return;
+  e.preventDefault();window.parent.postMessage(JSON.stringify({method:m}),"*");
+});
+["muN","muP","sdN","sdP","prev","n","sens","spec"].forEach(function(k){
+  if(q.has(k)&&isFinite(parseFloat(q.get(k)))) S[k]=parseFloat(q.get(k));
+});
+
+syncControls();draw();render();
+})();
+</script>
+</body>
+</html>

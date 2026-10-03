@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='828.00pt' height='295.20pt' viewBox='0 0 828.00 295.20'>
+<g class='svglite'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+    .svglite g.glyphgroup path {
+      fill: inherit;
+      stroke: none;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA='>
+    <rect x='0.00' y='0.00' width='828.00' height='295.20' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+<rect x='0.00' y='0.00' width='828.00' height='295.20' style='stroke-width: 1.26; stroke: none; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpNS45OHwyNjkuMzZ8NjQuMjV8MjYxLjkx'>
+    <rect x='5.98' y='64.25' width='263.38' height='197.66' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS45OHwyNjkuMzZ8NjQuMjV8MjYxLjkx)'>
+<line x1='45.94' y1='108.63' x2='108.13' y2='81.32' style='stroke-width: 1.92; stroke: #005EB8; stroke-linecap: butt;' />
+<line x1='45.94' y1='124.45' x2='108.13' y2='234.60' style='stroke-width: 1.92; stroke: #ED8B00; stroke-linecap: butt;' />
+<circle cx='45.94' cy='108.63' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='45.94' cy='124.45' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<circle cx='108.13' cy='81.32' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='108.13' cy='234.60' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<text x='41.58' y='112.60' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>80%</text>
+<text x='41.58' y='128.42' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>72%</text>
+<text x='112.48' y='85.29' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>96%</text>
+<text x='112.48' y='238.57' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>10%</text>
+<text x='142.33' y='84.88' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='55.70px' lengthAdjust='spacingAndGlyphs'>PET positive</text>
+<text x='142.33' y='238.16' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='59.56px' lengthAdjust='spacingAndGlyphs'>PET negative</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+</g>
+<defs>
+  <clipPath id='cpMjc5LjMyfDU0Mi43MHw2NC4yNXwyNjEuOTE='>
+    <rect x='279.32' y='64.25' width='263.38' height='197.66' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjc5LjMyfDU0Mi43MHw2NC4yNXwyNjEuOTE=)'>
+<line x1='319.28' y1='139.36' x2='381.47' y2='89.05' style='stroke-width: 1.92; stroke: #005EB8; stroke-linecap: butt;' />
+<line x1='319.28' y1='180.33' x2='381.47' y2='106.48' style='stroke-width: 1.92; stroke: #005EB8; stroke-linecap: butt;' />
+<line x1='319.28' y1='162.54' x2='381.47' y2='174.76' style='stroke-width: 1.92; stroke: #ED8B00; stroke-linecap: butt;' />
+<line x1='319.28' y1='204.05' x2='381.47' y2='210.34' style='stroke-width: 1.92; stroke: #ED8B00; stroke-linecap: butt;' />
+<circle cx='319.28' cy='139.36' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='319.28' cy='180.33' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='319.28' cy='162.54' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<circle cx='319.28' cy='204.05' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<circle cx='381.47' cy='89.05' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='381.47' cy='106.48' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='381.47' cy='174.76' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<circle cx='381.47' cy='210.34' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<text x='314.93' y='143.33' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>63%</text>
+<text x='314.93' y='184.30' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>40%</text>
+<text x='314.93' y='166.51' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>50%</text>
+<text x='314.93' y='208.02' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>27%</text>
+<text x='385.82' y='93.02' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>91%</text>
+<text x='385.82' y='110.45' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>82%</text>
+<text x='385.82' y='178.73' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>44%</text>
+<text x='385.82' y='214.31' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>24%</text>
+<text x='415.68' y='92.61' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='103.83px' lengthAdjust='spacingAndGlyphs'>Dementia, PET positive</text>
+<text x='415.68' y='110.04' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='79.48px' lengthAdjust='spacingAndGlyphs'>MCI, PET positive</text>
+<text x='415.68' y='178.32' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='107.69px' lengthAdjust='spacingAndGlyphs'>Dementia, PET negative</text>
+<text x='415.68' y='213.90' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='83.34px' lengthAdjust='spacingAndGlyphs'>MCI, PET negative</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+</g>
+<defs>
+  <clipPath id='cpNTUyLjY2fDgxNi4wNHw2NC4yNXwyNjEuOTE='>
+    <rect x='552.66' y='64.25' width='263.38' height='197.66' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTUyLjY2fDgxNi4wNHw2NC4yNXwyNjEuOTE=)'>
+<line x1='592.62' y1='122.83' x2='654.81' y2='223.82' style='stroke-width: 1.92; stroke: #212B32; stroke-linecap: butt;' />
+<circle cx='592.62' cy='122.83' r='2.98' style='stroke-width: 0.84; stroke: #212B32; fill: #212B32;' />
+<circle cx='654.81' cy='223.82' r='2.98' style='stroke-width: 0.84; stroke: #212B32; fill: #212B32;' />
+<text x='588.27' y='126.80' text-anchor='end' style='font-size: 11.10px;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>72%</text>
+<text x='659.17' y='227.79' style='font-size: 11.10px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='22.20px' lengthAdjust='spacingAndGlyphs'>16%</text>
+<text x='689.02' y='227.38' style='font-size: 9.96px;fill: #4C6272; font-family: "Arial";' textLength='48.70px' lengthAdjust='spacingAndGlyphs'>All patients</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+</g>
+<defs>
+  <clipPath id='cpNS45OHwyNjkuMzZ8NDEuODR8NjQuMjU='>
+    <rect x='5.98' y='41.84' width='263.38' height='22.41' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS45OHwyNjkuMzZ8NDEuODR8NjQuMjU=)'>
+<text x='11.16' y='57.70' style='font-size: 13.00px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='201.12px' lengthAdjust='spacingAndGlyphs'>Diagnosed as Alzheimer disease</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+</g>
+<defs>
+  <clipPath id='cpMjc5LjMyfDU0Mi43MHw0MS44NHw2NC4yNQ=='>
+    <rect x='279.32' y='41.84' width='263.38' height='22.41' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjc5LjMyfDU0Mi43MHw0MS44NHw2NC4yNQ==)'>
+<text x='284.50' y='57.70' style='font-size: 13.00px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='123.03px' lengthAdjust='spacingAndGlyphs'>On Alzheimer drugs</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+</g>
+<defs>
+  <clipPath id='cpNTUyLjY2fDgxNi4wNHw0MS44NHw2NC4yNQ=='>
+    <rect x='552.66' y='41.84' width='263.38' height='22.41' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTUyLjY2fDgxNi4wNHw0MS44NHw2NC4yNQ==)'>
+<text x='557.84' y='57.70' style='font-size: 13.00px; font-weight: bold;fill: #212B32; font-family: "Arial";' textLength='219.56px' lengthAdjust='spacingAndGlyphs'>Clinician uncertain of the diagnosis</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4MjguMDB8MC4wMHwyOTUuMjA=)'>
+<text x='45.94' y='275.18' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='30.62px' lengthAdjust='spacingAndGlyphs'>Before</text>
+<text x='45.94' y='287.03' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='20.22px' lengthAdjust='spacingAndGlyphs'>PET</text>
+<text x='108.13' y='275.18' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='36.42px' lengthAdjust='spacingAndGlyphs'>90 days</text>
+<text x='108.13' y='287.03' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='20.80px' lengthAdjust='spacingAndGlyphs'>after</text>
+<text x='319.28' y='275.18' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='30.62px' lengthAdjust='spacingAndGlyphs'>Before</text>
+<text x='319.28' y='287.03' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='20.22px' lengthAdjust='spacingAndGlyphs'>PET</text>
+<text x='381.47' y='275.18' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='36.42px' lengthAdjust='spacingAndGlyphs'>90 days</text>
+<text x='381.47' y='287.03' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='20.80px' lengthAdjust='spacingAndGlyphs'>after</text>
+<text x='592.62' y='275.18' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='30.62px' lengthAdjust='spacingAndGlyphs'>Before</text>
+<text x='592.62' y='287.03' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='20.22px' lengthAdjust='spacingAndGlyphs'>PET</text>
+<text x='654.81' y='275.18' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='36.42px' lengthAdjust='spacingAndGlyphs'>90 days</text>
+<text x='654.81' y='287.03' text-anchor='middle' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='20.80px' lengthAdjust='spacingAndGlyphs'>after</text>
+<line x1='13.45' y1='17.43' x2='21.42' y2='17.43' style='stroke-width: 1.92; stroke: #005EB8; stroke-linecap: butt;' />
+<circle cx='17.43' cy='17.43' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<circle cx='17.43' cy='17.43' r='2.98' style='stroke-width: 0.84; stroke: #005EB8; fill: #005EB8;' />
+<line x1='134.43' y1='17.43' x2='142.40' y2='17.43' style='stroke-width: 1.92; stroke: #ED8B00; stroke-linecap: butt;' />
+<circle cx='138.41' cy='17.43' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<circle cx='138.41' cy='17.43' r='2.98' style='stroke-width: 0.84; stroke: #ED8B00; fill: #ED8B00;' />
+<text x='28.89' y='21.15' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='98.06px' lengthAdjust='spacingAndGlyphs'>Amyloid PET positive</text>
+<text x='149.87' y='21.15' style='font-size: 10.40px;fill: #212B32; font-family: "Arial";' textLength='102.11px' lengthAdjust='spacingAndGlyphs'>Amyloid PET negative</text>
+</g>
+</g>
+</svg>

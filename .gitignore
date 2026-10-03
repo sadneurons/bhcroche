@@ -1,0 +1,5 @@
+# Only the rendered deck in docs/ is published (GitHub Pages serves that folder).
+# Everything else (source, data, scripts, papers, working files) stays on this machine.
+/*
+!/.gitignore
+!/docs/
