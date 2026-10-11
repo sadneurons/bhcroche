@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a result means: pre-test probability</title>
+<style>
+:root{
+  --blue:#005eb8; --dark:#003087; --ink:#212b32; --muted:#4c6272; --line:#d8dde0; --bg:#ffffff; --panel:#f0f4f5;
+  --pos:#005eb8; --neg:#aeb7bd; --fp:#ae2573; --fn:#ed8b00;
+  --t-neg:#00675f; --t-mid:#8a5a00; --t-pos:#003087;
+  --font:Frutiger,"Frutiger LT Std",Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 var(--font);display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto minmax(0,1fr);overflow:hidden}
+header{grid-column:1 / -1;padding:10px 16px;background:var(--blue);color:#fff}
+header h1{margin:0;font-size:19px}
+header p{margin:2px 0 0;font-size:13px;opacity:.92}
+.embed header{display:none}
+.embed .tiles{grid-template-columns:1fr;margin-right:100px} /* keeps clear of the deck's corner QR code */
+.embed .tile b{font-size:21px}
+.left{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:minmax(0,1fr);gap:10px;padding:8px 6px 6px 10px}
+.left>svg{min-height:0}
+svg{display:block;width:100%;height:100%;user-select:none}
+.people{display:flex;flex-direction:column;min-height:0}
+.people h2{margin:0 0 4px;font-size:14px;color:var(--muted);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;flex:1 1 auto;min-height:0;align-content:start}
+.p{aspect-ratio:1;border-radius:50% 50% 35% 35%;background:var(--neg);position:relative}
+.p::after{content:"";position:absolute;left:30%;right:30%;top:10%;height:32%;border-radius:50%;background:inherit;filter:brightness(1.35)}
+.p.tp{background:var(--pos)} .p.fp{background:var(--fp)} .p.fn{background:var(--fn)}
+.key{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;font-size:12px;color:var(--muted);margin-top:6px}
+.key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;background:var(--neg)}
+.key .tp::before{background:var(--pos)} .key .fp::before{background:var(--fp)} .key .fn::before{background:var(--fn)}
+.side{min-height:0;overflow:auto;background:var(--panel);border-left:4px solid var(--blue);padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tile{border-radius:4px;padding:6px 8px;line-height:1.2;background:#fff;border:1px solid var(--line)}
+.tile b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+.tile span{font-size:11.5px;color:var(--muted)}
+.tile.pos b{color:var(--t-pos)} .tile.neg b{color:var(--t-neg)}
+.verdict{margin:0;font-size:12.5px;font-weight:700;min-height:2.4em}
+.verdict.ok{color:var(--t-neg)} .verdict.warn{color:var(--t-mid)}
+h3{margin:4px 0 0;font-size:12.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.presets{display:flex;flex-wrap:wrap;gap:5px}
+.presets button{font:inherit;font-size:12px;border:1px solid var(--muted);background:#fff;color:var(--ink);border-radius:4px;padding:4px 8px;cursor:pointer}
+.presets button:hover{border-color:var(--blue);color:var(--blue)}
+.ctl{display:grid;grid-template-columns:1fr 48px;gap:1px 8px;align-items:center;font-size:12.5px}
+.ctl label{grid-column:1 / -1;color:var(--muted);margin-top:2px}
+.ctl output{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:0;accent-color:var(--blue)}
+:focus-visible{outline:3px solid #ffb81c;outline-offset:1px}
+text{font-family:var(--font)}
+</style>
+</head>
+<body>
+<header>
+  <h1>What a result means: pre-test probability</h1>
+  <p>Set how likely amyloid was before the test and how good the test is; see what a positive or negative result is worth.</p>
+</header>
+<div class="left">
+  <svg id="svg" viewBox="0 0 600 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Positive and negative predictive value against pre-test probability"></svg>
+  <div class="people">
+    <h2 id="people-title">100 people like this patient</h2>
+    <div class="grid" id="grid" aria-hidden="true"></div>
+    <div class="key">
+      <span class="tp">Amyloid, test positive</span><span class="fp">No amyloid, test positive</span>
+      <span class="fn">Amyloid, test negative</span><span>No amyloid, test negative</span>
+    </div>
+  </div>
+</div>
+<aside class="side">
+  <div class="tiles">
+    <div class="tile pos"><span>If the test is positive, amyloid in</span><b id="ppv">–</b></div>
+    <div class="tile neg"><span>If the test is negative, no amyloid in</span><b id="npv">–</b></div>
+  </div>
+  <p class="verdict" id="verdict"></p>
+  <h3>Patient before the test</h3>
+  <div class="presets" id="pt-presets">
+    <button type="button" data-prior="20">Cognitively normal, 65</button>
+    <button type="button" data-prior="30">Cognitively normal, 75</button>
+    <button type="button" data-prior="40">MCI, 65</button>
+    <button type="button" data-prior="55">MCI, 75</button>
+    <button type="button" data-prior="85">Dementia, 75</button>
+  </div>
+  <div class="ctl">
+    <label for="c-prior">Chance of amyloid before the test</label>
+    <input type="range" id="c-prior" min="2" max="98" step="1"><output id="o-prior"></output>
+  </div>
+  <h3>The test</h3>
+  <div class="presets" id="test-presets">
+    <button type="button" data-sens="90" data-spec="95">Rule-in band, two cut-offs</button>
+    <button type="button" data-sens="90" data-spec="90">Single cut-off, 90 / 90</button>
+    <button type="button" data-sens="75" data-spec="75">Weaker assay, 75 / 75</button>
+  </div>
+  <div class="ctl">
+    <label for="c-sens">Sensitivity</label>
+    <input type="range" id="c-sens" min="50" max="99" step="1"><output id="o-sens"></output>
+    <label for="c-spec">Specificity</label>
+    <input type="range" id="c-spec" min="50" max="99" step="1"><output id="o-spec"></output>
+  </div>
+</aside>
+
+<script>
+(function(){
+"use strict";
+var NS="http://www.w3.org/2000/svg";
+var S={prior:0.40,sens:0.90,spec:0.95};
+var svg=document.getElementById("svg"),grid=document.getElementById("grid");
+var $=function(id){return document.getElementById(id)};
+var W=600,H=560,L=58,R=582,T=30,B=500;
+
+function el(name,attrs,parent,text){
+  var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  if(text!=null) e.textContent=text;
+  (parent||svg).appendChild(e);return e;
+}
+function ppv(p,se,sp){return p*se/(p*se+(1-p)*(1-sp))}
+function npv(p,se,sp){return (1-p)*sp/((1-p)*sp+p*(1-se))}
+function pct(v){return Math.round(100*v)+"%"}
+function sx(p){return L+p*(R-L)} function sy(v){return B-v*(B-T)}
+
+for(var i=0;i<100;i++){var d=document.createElement("div");d.className="p";grid.appendChild(d);}
+
+function render(){
+  var p=S.prior,se=S.sens,sp=S.spec,PPV=ppv(p,se,sp),NPV=npv(p,se,sp);
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  /* decisive band: where a negative leaves <10% and a positive gives >80% */
+  var lo=null,hi=null;
+  for(var q=0.001;q<1;q+=0.001){var ok=npv(q,se,sp)>=0.9&&ppv(q,se,sp)>=0.8; if(ok&&lo==null) lo=q; if(ok) hi=q;}
+  if(lo!=null) el("rect",{x:sx(lo),y:T,width:sx(hi)-sx(lo),height:B-T,fill:"#ffe9b8",opacity:.7});
+  /* grid lines and axes */
+  [0.2,0.4,0.6,0.8,1].forEach(function(v){
+    el("line",{x1:L,x2:R,y1:sy(v),y2:sy(v),stroke:"var(--line)","stroke-width":1});
+    el("text",{x:L-8,y:sy(v)+4,"text-anchor":"end","font-size":12,fill:"var(--muted)"},svg,pct(v));
+  });
+  [0,0.2,0.4,0.6,0.8,1].forEach(function(v){
+    el("text",{x:sx(v),y:B+18,"text-anchor":"middle","font-size":12,fill:"var(--muted)"},svg,pct(v));
+  });
+  el("line",{x1:L,x2:R,y1:B,y2:B,stroke:"var(--muted)","stroke-width":1.2});
+  el("text",{x:(L+R)/2,y:B+40,"text-anchor":"middle","font-size":14,fill:"var(--muted)"},svg,"Chance of amyloid before the test");
+  el("line",{x1:L,x2:R,y1:sy(0.8),y2:sy(0.8),stroke:"var(--t-pos)","stroke-width":1,"stroke-dasharray":"4 4"});
+  el("line",{x1:L,x2:R,y1:sy(0.9),y2:sy(0.9),stroke:"var(--t-neg)","stroke-width":1,"stroke-dasharray":"4 4"});
+  /* curves */
+  function curve(f,colour){var d="";for(var i=0;i<=200;i++){var q=i/200;d+=(i?"L":"M")+sx(q).toFixed(1)+","+sy(f(q,se,sp)).toFixed(1);}el("path",{d:d,fill:"none",stroke:colour,"stroke-width":3});}
+  curve(ppv,"var(--pos)");curve(npv,"var(--t-neg)");
+  /* legend, bottom left of the plot where both curves are low */
+  el("line",{x1:L+12,x2:L+40,y1:B-44,y2:B-44,stroke:"var(--pos)","stroke-width":3});
+  el("text",{x:L+48,y:B-40,"font-size":13,"font-weight":700,fill:"var(--pos)"},svg,"Positive result: chance amyloid is present");
+  el("line",{x1:L+12,x2:L+40,y1:B-22,y2:B-22,stroke:"var(--t-neg)","stroke-width":3});
+  el("text",{x:L+48,y:B-18,"font-size":13,"font-weight":700,fill:"var(--t-neg)"},svg,"Negative result: chance amyloid is absent");
+  if(lo!=null) el("text",{x:sx((lo+hi)/2),y:B-62,"text-anchor":"middle","font-size":12.5,"font-weight":700,fill:"var(--t-mid)"},svg,"Both decisive: "+pct(lo)+" to "+pct(hi));
+  /* marker for this patient */
+  el("line",{x1:sx(p),x2:sx(p),y1:T,y2:B,stroke:"var(--ink)","stroke-width":1.5});
+  el("circle",{cx:sx(p),cy:sy(PPV),r:7,fill:"var(--pos)",stroke:"#fff","stroke-width":2});
+  el("circle",{cx:sx(p),cy:sy(NPV),r:7,fill:"var(--t-neg)",stroke:"#fff","stroke-width":2});
+  el("text",{x:sx(p)+(p>0.8?-10:10),y:sy(PPV)+(PPV>NPV?-12:20),"text-anchor":p>0.8?"end":"start","font-size":13,"font-weight":700,fill:"var(--pos)"},svg,pct(PPV));
+  el("text",{x:sx(p)+(p>0.8?-10:10),y:sy(NPV)+(PPV>NPV?20:-12),"text-anchor":p>0.8?"end":"start","font-size":13,"font-weight":700,fill:"var(--t-neg)"},svg,pct(NPV));
+
+  /* 100 people */
+  var tp=Math.round(100*p*se),fn=Math.round(100*p)-tp,fp=Math.round(100*(1-p)*(1-sp));
+  var cells=grid.children,k=0;
+  for(k=0;k<100;k++){cells[k].className="p"+(k<tp?" tp":k<tp+fn?" fn":k<tp+fn+fp?" fp":"");}
+  $("people-title").textContent="100 people like this patient: "+Math.round(100*p)+" have amyloid, "+(tp+fp)+" test positive";
+
+  $("ppv").textContent=pct(PPV);$("npv").textContent=pct(NPV);
+  var v=$("verdict");
+  if(PPV>=0.8&&NPV>=0.9){v.className="verdict ok";v.textContent="Either result is decisive for this patient.";}
+  else if(PPV<0.8&&NPV>=0.9){v.className="verdict warn";v.textContent="A negative result rules amyloid out; a positive one needs CSF or PET to confirm.";}
+  else if(PPV>=0.8&&NPV<0.9){v.className="verdict warn";v.textContent="A positive result confirms; a negative one cannot be trusted on its own.";}
+  else{v.className="verdict warn";v.textContent="Neither result settles the question for this patient.";}
+}
+
+var CTL=[["c-prior","prior","o-prior"],["c-sens","sens","o-sens"],["c-spec","spec","o-spec"]];
+function sync(){CTL.forEach(function(c){$(c[0]).value=Math.round(S[c[1]]*100);$(c[2]).textContent=Math.round(S[c[1]]*100)+"%";});}
+CTL.forEach(function(c){$(c[0]).addEventListener("input",function(){S[c[1]]=this.value/100;$(c[2]).textContent=this.value+"%";render();});});
+$("pt-presets").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.prior=b.dataset.prior/100;sync();render();});
+$("test-presets").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.sens=b.dataset.sens/100;S.spec=b.dataset.spec/100;sync();render();});
+
+var q=new URLSearchParams(location.search),inFrame=false;
+try{inFrame=window.self!==window.top}catch(e){inFrame=true}
+if(q.get("embed")==="1"||(inFrame&&q.get("embed")!=="0")) document.documentElement.classList.add("embed");
+if(inFrame) document.addEventListener("keydown",function(e){
+  if(e.target.closest&&e.target.closest("input")) return;
+  var m={PageDown:"next",PageUp:"prev",ArrowRight:"next",ArrowLeft:"prev"}[e.key];
+  if(!m||e.altKey||e.ctrlKey||e.metaKey) return;
+  e.preventDefault();window.parent.postMessage(JSON.stringify({method:m}),"*");
+});
+["prior","sens","spec"].forEach(function(k){if(q.has(k)&&isFinite(parseFloat(q.get(k)))) S[k]=parseFloat(q.get(k))/100;});
+sync();render();
+})();
+</script>
+</body>
+</html>
